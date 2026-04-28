@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bifrost Complexity Treemap</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Code Complexity Treemap</h1>
+      <p>Explore complexity hotspots, callsites, and function-reference navigation.</p>
+    </header>
+
+    <section class="controls">
+      <label>
+        Scoring model
+        <select id="model-select">
+          <option value="cyclomatic">Cyclomatic</option>
+          <option value="cognitive">Cognitive</option>
+          <option value="max">Max(cyclomatic, cognitive)</option>
+          <option value="weighted">Weighted sum</option>
+        </select>
+      </label>
+
+      <div class="package-filter-control">
+        <span id="package-filter-label" class="package-filter-label">Showing packages</span>
+        <button id="package-filter-open" class="package-filter-open" type="button">Choose packages</button>
+      </div>
+
+      <label class="weight-control">
+        Cyclomatic weight
+        <input id="cyclo-weight" type="number" min="0" step="0.1" value="0.5">
+      </label>
+
+      <label class="weight-control">
+        Cognitive weight
+        <input id="cogn-weight" type="number" min="0" step="0.1" value="1.0">
+      </label>
+    </section>
+
+    <section class="legend">
+      <span><i class="legend-box low"></i>Low</span>
+      <span><i class="legend-box medium"></i>Medium</span>
+      <span><i class="legend-box high"></i>High</span>
+    </section>
+
+    <main class="layout">
+      <section class="treemap-panel">
+        <div id="status"></div>
+        <div id="chart"></div>
+      </section>
+    </main>
+
+    <div id="inspect-modal-backdrop" class="inspect-modal-backdrop hidden">
+      <div id="inspect-modal" class="inspect-modal" role="dialog" aria-modal="true" aria-labelledby="inspect-title">
+        <button id="inspect-close" class="inspect-close" type="button" aria-label="Close inspector">×</button>
+        <h2 id="inspect-title"></h2>
+        <div id="inspect-meta" class="inspect-meta"></div>
+        <div id="inspect-warning" class="inspect-warning hidden"></div>
+
+        <section class="inspect-scores">
+          <div class="inspect-score-row">
+            <div class="inspect-score-head">
+              <span class="inspect-score-label">
+                Cyclomatic complexity
+                <span
+                  class="inspect-info-icon"
+                  role="img"
+                  aria-label="Cyclomatic complexity information"
+                  data-tooltip="Cyclomatic complexity measures the number of linearly independent control-flow paths through a function. More branches and decisions increase this score."
+                ><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
+              </span>
+              <span id="inspect-score-cyclomatic-value" class="inspect-score-value">-</span>
+            </div>
+            <div class="inspect-score-track">
+              <div id="inspect-score-cyclomatic-bar" class="inspect-score-fill"></div>
+            </div>
+          </div>
+          <div class="inspect-score-row">
+            <div class="inspect-score-head">
+              <span class="inspect-score-label">
+                Cognitive complexity
+                <span
+                  class="inspect-info-icon"
+                  role="img"
+                  aria-label="Cognitive complexity information"
+                  data-tooltip="Cognitive complexity estimates how hard code is to understand by accounting for nested flow and mental overhead, not just number of paths."
+                ><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
+              </span>
+              <span id="inspect-score-cognitive-value" class="inspect-score-value">-</span>
+            </div>
+            <div class="inspect-score-track">
+              <div id="inspect-score-cognitive-bar" class="inspect-score-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h4>Source</h4>
+          <div id="inspect-editor" class="inspect-editor"></div>
+        </section>
+
+        <section id="inspect-reference-from-section" hidden>
+          <h4>Reference From</h4>
+          <ul id="inspect-reference-from" class="inspect-list"></ul>
+        </section>
+
+        <section>
+          <h4>Called By</h4>
+          <ul id="inspect-backlinks" class="inspect-list"></ul>
+        </section>
+      </div>
+    </div>
+
+    <div id="package-filter-modal-backdrop" class="package-filter-modal-backdrop hidden">
+      <div id="package-filter-modal" class="package-filter-modal" role="dialog" aria-modal="true" aria-labelledby="package-filter-title">
+        <div class="package-filter-modal-head">
+          <h3 id="package-filter-title">Select packages by relationship</h3>
+          <button id="package-filter-close" class="inspect-close" type="button" aria-label="Close package filter">×</button>
+        </div>
+        <div class="package-filter-help">
+          Packages are grouped by call relationships. Packages in the same group call each other directly or transitively.
+        </div>
+        <div class="package-filter-toolbar">
+          <button id="package-filter-select-all" type="button">Select all</button>
+          <button id="package-filter-select-none" type="button">Select none</button>
+        </div>
+        <div id="package-filter-table" class="package-filter-table"></div>
+        <div class="package-filter-footer">
+          <button id="package-filter-cancel" type="button">Cancel</button>
+          <button id="package-filter-apply" type="button">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+    <div id="info-tooltip" class="info-tooltip hidden"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
