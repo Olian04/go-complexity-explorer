@@ -1,0 +1,120 @@
+# GoReleaser: https://goreleaser.com/
+# Run from repo root (CI sets COMPLEXITY_EXPLORER_BUILD_TIME, RELEASE_NAME, RELEASE_BODY):
+#   goreleaser check
+version: 2
+
+project_name: complexity-explorer
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: complexity-explorer
+    main: ./cmd/complexity-explorer
+    binary: complexity-explorer
+    flags:
+      - -trimpath
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -X github.com/Olian04/go-complexity-explorer/cmd/complexity-explorer/version.Version={{ .Tag }}
+      - -X github.com/Olian04/go-complexity-explorer/cmd/complexity-explorer/version.Revision={{ .Commit }}
+      - -X github.com/Olian04/go-complexity-explorer/cmd/complexity-explorer/version.BuildTime={{ .Env.COMPLEXITY_EXPLORER_BUILD_TIME }}
+
+# Loose binaries (one file per OS/arch), not tarballs.
+archives:
+  - id: complexity-explorer
+    formats: [binary]
+    name_template: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}'
+    ids:
+      - complexity-explorer
+
+checksum:
+  name_template: checksums.txt
+
+# Syft must be on PATH (CI installs it before GoReleaser).
+# https://goreleaser.com/customization/sbom/
+sboms:
+  - id: complexity-explorer
+    artifacts: binary
+    ids:
+      - complexity-explorer
+    disable: false
+
+# use: git works locally without GITHUB_TOKEN; commit list between tags.
+changelog:
+  use: git
+  sort: asc
+  abbrev: 7
+  filters:
+    exclude:
+      - '(?i)^merge '
+      - '(?i)^merge pull request'
+      - "^chore\\(release\\):"
+      - '^ci:'
+      - '^docs:'
+
+release:
+  prerelease: auto
+  name_template: '{{ .Env.RELEASE_NAME }}'
+  # RELEASE_BODY is set by CI. Changelog is inserted between header and footer.
+  header: |
+    {{ .Env.RELEASE_BODY }}
+
+  footer: |
+    ## Install with the Go toolchain
+
+    Pinned to this release ({{ .Tag }}). Either flow works.
+
+    **`go install` — install the binary into `$PATH`:**
+
+    ```bash
+    go install github.com/Olian04/go-complexity-explorer/cmd/complexity-explorer@{{ .Tag }}
+    ```
+
+    The binary lands in `$(go env GOBIN)` (or `$(go env GOPATH)/bin` if `GOBIN` is unset). Make sure that directory is on your `PATH`, then run `complexity-explorer`.
+
+    **`go tool` — pin the tool inside an existing Go module (Go 1.24+):**
+
+    ```bash
+    go get -tool github.com/Olian04/go-complexity-explorer/cmd/complexity-explorer@{{ .Tag }}
+    go tool complexity-explorer
+    ```
+
+    This records the tool in the consuming module's `go.mod` so every contributor runs the same version.
+
+    ## Download pre-built binaries
+
+    | Asset | Description |
+    |-------|-------------|
+    | `checksums.txt` | SHA256 checksums for all files in this release |
+    | `complexity-explorer-*` | Per-OS/arch binaries |
+    | `*.sbom.json` | SPDX JSON SBOM per binary ([Syft](https://github.com/anchore/syft)) |
+
+    Verify after download (Linux/macOS):
+
+    ```bash
+    sha256sum -c checksums.txt
+    ```
+
+    On Windows, verify the printed SHA256 against the file from `checksums.txt` using your preferred tool.
+
+    ## macOS Gatekeeper
+
+    If macOS shows a Gatekeeper warning ("Apple could not verify…"):
+
+    ```bash
+    # Apple Silicon (arm64)
+    xattr -d com.apple.quarantine complexity-explorer-darwin-arm64
+
+    # Intel (amd64)
+    xattr -d com.apple.quarantine complexity-explorer-darwin-amd64
+    ```
