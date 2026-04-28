@@ -1,0 +1,21 @@
+/* Single CSS entry point referenced from index.html. All component
+   stylesheets are pulled in via @import, in load order:
+
+   - base       resets, body styling, default form-control look-and-feel
+   - controls   top toolbar (scoring model, package picker, thresholds)
+   - treemap    chart area and treemap markers
+   - modals     package picker, inspector frame, scores, source editor
+   - vendor     Font Awesome icons used by the inspector hover popups
+
+   @import rules must precede every other rule in the file, so anything
+   we want loaded before component CSS goes here, and component CSS comes
+   right after. */
+
+@import url("./base.css");
+@import url("./controls.css");
+@import url("./treemap.css");
+@import url("./packages-modal.css");
+@import url("./inspector-modal.css");
+@import url("./inspector-scores.css");
+@import url("./inspector-editor.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css");

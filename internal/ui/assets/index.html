@@ -6,9 +6,7 @@
     <title>Bifrost Complexity Explorer</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <link rel="stylesheet" href="./styles/main.css">
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
   </head>
   <body>
@@ -33,14 +31,24 @@
         <button id="package-filter-open" class="package-filter-open" type="button">Choose packages</button>
       </div>
 
-      <label class="weight-control">
+      <label class="weight-control hidden">
         Cyclomatic weight
         <input id="cyclo-weight" type="number" min="0" step="0.1" value="0.5">
       </label>
 
-      <label class="weight-control">
+      <label class="weight-control hidden">
         Cognitive weight
         <input id="cogn-weight" type="number" min="0" step="0.1" value="1.0">
+      </label>
+
+      <label>
+        Warn threshold
+        <input id="warn-threshold" type="number" min="0" step="1" value="10">
+      </label>
+
+      <label>
+        High threshold
+        <input id="high-threshold" type="number" min="0" step="1" value="15">
       </label>
     </section>
 
@@ -101,7 +109,7 @@
           </div>
         </section>
 
-        <section>
+        <section class="inspect-source-section">
           <h4>Source</h4>
           <div id="inspect-editor" class="inspect-editor"></div>
         </section>
@@ -141,6 +149,6 @@
 
     <div id="tooltip" class="tooltip"></div>
     <div id="info-tooltip" class="info-tooltip hidden"></div>
-    <script src="./app.js"></script>
+    <script type="module" src="./javascript/main.mjs"></script>
   </body>
 </html>

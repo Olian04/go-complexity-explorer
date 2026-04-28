@@ -1,0 +1,105 @@
+/* Treemap viewport: status line, chart container, leaf rectangles, the
+   labels that appear inside large enough tiles, the per-tile markers
+   (unused / external-callback), and the floating hover tooltip that follows
+   the cursor while moused over a tile. */
+
+#status {
+  margin-bottom: 8px;
+  color: #93c5fd;
+  font-size: 13px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.treemap-panel {
+  min-width: 0;
+}
+
+#chart {
+  width: 100%;
+  height: calc(100vh - 220px);
+  min-height: 520px;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #020617;
+}
+
+.node {
+  stroke: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+}
+
+.node-label-box {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.node-label {
+  font-size: 11px;
+  line-height: 1.2;
+  color: #f8fafc;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  pointer-events: none;
+}
+
+.treemap-marker {
+  pointer-events: none;
+}
+
+.unused-marker-triangle {
+  fill: #f59e0b;
+  stroke: rgba(15, 23, 42, 0.8);
+  stroke-width: 0.8;
+}
+
+.unused-marker-text {
+  fill: #0f172a;
+  font-size: 8px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.external-callback-marker-text {
+  font-size: 10px;
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.marker-hidden {
+  display: none;
+}
+
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  display: none;
+  max-width: 460px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: rgba(2, 6, 23, 0.96);
+  color: #f8fafc;
+  font-size: 12px;
+  z-index: 100;
+  white-space: pre-line;
+}
+
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  #chart {
+    height: 560px;
+  }
+}

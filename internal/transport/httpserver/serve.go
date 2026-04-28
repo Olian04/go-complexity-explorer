@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log/slog"
+	"mime"
 	"net/http"
 	"time"
 )
@@ -19,6 +20,19 @@ import (
 // shutdownTimeout bounds how long Shutdown waits for in-flight requests to
 // drain after the caller's context is cancelled.
 const shutdownTimeout = 10 * time.Second
+
+// init registers the MIME type for ECMAScript modules served from the
+// embedded UI filesystem. Go's stdlib mime package only knows about ".js"
+// out of the box; without this, http.FileServer would sniff ".mjs" files
+// as text/plain and modern browsers would refuse to execute them with a
+// strict-MIME-type error.
+func init() {
+	if err := mime.AddExtensionType(".mjs", "text/javascript; charset=utf-8"); err != nil {
+		// AddExtensionType only fails for malformed types; the literal
+		// above is well-formed so this is unreachable in practice.
+		panic("httpserver: register .mjs mime type: " + err.Error())
+	}
+}
 
 // Serve marshals data, then listens on addr and serves /api/complexity
 // alongside the contents of uiFiles. Every request is logged via logger.

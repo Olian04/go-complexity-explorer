@@ -1,0 +1,97 @@
+/* The Monaco editor mounted inside the inspector modal: the container,
+   the per-line complexity-contributor glyphs in the gutter (Font Awesome
+   codepoints), the inline source-link decorations (with their Cmd/Ctrl
+   modifier variant), and small overrides for Monaco's hover popups. */
+
+.inspect-editor {
+  border: 1px solid #1f2937;
+  border-radius: 6px;
+  background: #0b1220;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.inspect-editor .complexity-glyph {
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1;
+  font-size: 12px;
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.inspect-editor .complexity-glyph-medium-if::before {
+  content: "\3f";
+  color: #f97316;
+}
+
+.inspect-editor .complexity-glyph-medium-loop::before {
+  content: "\f01e";
+  color: #22c55e;
+}
+
+.inspect-editor .complexity-glyph-high-switch::before {
+  content: "\f126";
+  color: #ef4444;
+}
+
+.inspect-editor .complexity-glyph-medium-case::before {
+  content: "\f12e";
+  color: #f59e0b;
+}
+
+.inspect-editor .complexity-glyph-low-logic::before {
+  content: "\f013";
+  color: #38bdf8;
+}
+
+.inspect-editor .complexity-glyph-low-other::before {
+  content: "\f041";
+  color: #a78bfa;
+}
+
+.inspect-editor .complexity-glyph-medium-recursion::before {
+  content: "\f2ea";
+  color: #14b8a6;
+}
+
+.inspect-editor .complexity-glyph-high-cyclic-recursion::before {
+  content: "\f021";
+  color: #ec4899;
+}
+
+.inspect-editor .complexity-glyph-overflow::before {
+  content: "\f141";
+  color: #e2e8f0;
+}
+
+.inspect-editor .inspect-function-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  color: #93c5fd;
+  cursor: pointer !important;
+}
+
+.inspect-editor .inspect-function-link-modifier {
+  text-decoration: none;
+  color: inherit;
+}
+
+.inspect-editor.modifier-nav-enabled .inspect-function-link-modifier {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  color: #93c5fd;
+  cursor: pointer !important;
+}
+
+.monaco-editor .monaco-hover {
+  font-size: 11px !important;
+}
+
+.monaco-editor .monaco-hover .hover-contents {
+  font-size: 11px !important;
+  line-height: 1.25;
+}

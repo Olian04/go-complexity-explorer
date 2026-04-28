@@ -1,0 +1,66 @@
+/* The top control strip: scoring model, package picker trigger, weight and
+   threshold inputs, plus the severity legend that sits directly below it. */
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.package-filter-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 240px;
+}
+
+.package-filter-label {
+  font-size: 13px;
+  color: #cbd5e1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.package-filter-open {
+  background: #111827;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.weight-control.hidden {
+  display: none;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.legend-box {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.legend-box.low {
+  background: #16a34a;
+}
+
+.legend-box.medium {
+  background: #eab308;
+}
+
+.legend-box.high {
+  background: #dc2626;
+}
