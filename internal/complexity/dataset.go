@@ -54,3 +54,18 @@ func (d Dataset) WriteJSON(path string) error {
 	}
 	return nil
 }
+
+// ReadDataset reads a JSON snapshot previously produced by Dataset.WriteJSON
+// and decodes it into a Dataset value.
+func ReadDataset(path string) (Dataset, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return Dataset{}, fmt.Errorf("read snapshot %q: %w", path, err)
+	}
+
+	var dataset Dataset
+	if err := json.Unmarshal(data, &dataset); err != nil {
+		return Dataset{}, fmt.Errorf("unmarshal snapshot %q: %w", path, err)
+	}
+	return dataset, nil
+}

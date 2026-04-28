@@ -63,6 +63,31 @@ func Serve(ctx context.Context, opts ServeOptions, logger *slog.Logger) error {
 	return httpserver.Serve(ctx, opts.Addr, dataset, ui.Files(), logger)
 }
 
+// ViewOptions configures the "load snapshot and serve over HTTP" use case.
+type ViewOptions struct {
+	Input string
+	Addr  string
+}
+
+// View loads a previously-produced JSON snapshot from disk and serves it,
+// together with the embedded UI, over HTTP. It mirrors Serve but skips the
+// analyzer entirely.
+func View(ctx context.Context, opts ViewOptions, logger *slog.Logger) error {
+	dataset, err := complexity.ReadDataset(opts.Input)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("snapshot loaded",
+		"path", opts.Input,
+		"generated_at", dataset.GeneratedAt,
+		"packages", countPackages(dataset),
+		"functions", len(dataset.Functions),
+	)
+
+	return httpserver.Serve(ctx, opts.Addr, dataset, ui.Files(), logger)
+}
+
 func countPackages(dataset complexity.Dataset) int {
 	seen := make(map[string]struct{}, len(dataset.Functions))
 	for _, fn := range dataset.Functions {

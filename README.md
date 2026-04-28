@@ -94,6 +94,20 @@ complexity-explorer analyze \
 The JSON contains every function's identity, complexity scores, and inspector
 payload (source, contributors, backlinks).
 
+### Re-open a saved snapshot
+
+Once you have a snapshot, the `view` subcommand serves the inspector UI
+against it without re-running the analyzer. This is the fast way to share a
+specific state of the codebase or to revisit one over time:
+
+```bash
+complexity-explorer analyze --root . --output ./complexity.json
+complexity-explorer view --input ./complexity.json
+```
+
+`view` accepts the same `--addr` flag as the default action and ignores
+`--root` / `--include` since no analysis is performed.
+
 ### Help and version
 
 ```bash

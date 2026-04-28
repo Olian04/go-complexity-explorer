@@ -22,9 +22,10 @@ func main() {
 
 	// The root command analyzes the target repo and serves the inspector
 	// over HTTP. Running the binary with no subcommand performs this
-	// default action; `analyze` is the only opt-in subcommand. Help is
-	// reachable via --help / -h (the auto-generated `help` subcommand is
-	// hidden).
+	// default action. Two opt-in subcommands are available: `analyze`
+	// writes a JSON snapshot to disk, and `view` serves the UI against a
+	// previously-produced snapshot. Help is reachable via --help / -h (the
+	// auto-generated `help` subcommand is hidden).
 	root := &cli.Command{
 		Name:            "complexity-explorer",
 		Usage:           "Analyze a Go repo and serve the complexity explorer UI",
@@ -50,6 +51,7 @@ func main() {
 		Action: runServe,
 		Commands: []*cli.Command{
 			analyzeCommand(),
+			viewCommand(),
 		},
 	}
 
@@ -112,6 +114,37 @@ func runAnalyze(_ context.Context, c *cli.Command) error {
 		Include: c.String("include"),
 		Output:  output,
 	})
+}
+
+func viewCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "view",
+		Usage: "Serve the UI against a previously-produced JSON snapshot",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "input",
+				Usage: "JSON snapshot file produced by `analyze`",
+			},
+			&cli.StringFlag{
+				Name:  "addr",
+				Usage: "HTTP listen address",
+				Value: ":8787",
+			},
+		},
+		Action: runView,
+	}
+}
+
+func runView(ctx context.Context, c *cli.Command) error {
+	input := strings.TrimSpace(c.String("input"))
+	if input == "" {
+		return errors.New("missing --input")
+	}
+
+	return app.View(ctx, app.ViewOptions{
+		Input: input,
+		Addr:  c.String("addr"),
+	}, newLogger(c.Root().ErrWriter))
 }
 
 func printVersion(cmd *cli.Command) {
