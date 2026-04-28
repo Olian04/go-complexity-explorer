@@ -477,8 +477,8 @@ input {
   border: 1px solid #1f2937;
   border-radius: 6px;
   background: #0b1220;
-  height: min(48vh, 560px);
-  min-height: 240px;
+  height: min(60vh, 720px);
+  min-height: 320px;
 }
 
 .inspect-editor .complexity-glyph {
