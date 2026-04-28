@@ -1,4 +1,4 @@
-package main
+package complexitytreemap
 
 import (
 	"encoding/json"

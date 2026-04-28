@@ -1,4 +1,4 @@
-package main
+package complexitytreemap
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -20,45 +21,46 @@ import (
 	"github.com/uudashr/gocognit"
 )
 
-func main() {
-	if len(os.Args) < 2 {
-		printUsage()
-		os.Exit(2)
+func Execute(args []string, stdout, stderr io.Writer) int {
+	if len(args) < 1 {
+		printUsage(stderr)
+		return 2
 	}
 
-	switch os.Args[1] {
+	switch args[0] {
 	case "analyze":
-		if err := runAnalyze(os.Args[2:]); err != nil {
-			fmt.Fprintf(os.Stderr, "analyze: %v\n", err)
-			os.Exit(1)
+		if err := runAnalyze(args[1:]); err != nil {
+			fmt.Fprintf(stderr, "analyze: %v\n", err)
+			return 1
 		}
 	case "serve":
-		if err := runServe(os.Args[2:]); err != nil {
-			fmt.Fprintf(os.Stderr, "serve: %v\n", err)
-			os.Exit(1)
+		if err := runServe(args[1:], stdout); err != nil {
+			fmt.Fprintf(stderr, "serve: %v\n", err)
+			return 1
 		}
 	default:
-		printUsage()
-		os.Exit(2)
+		printUsage(stderr)
+		return 2
 	}
+	return 0
 }
 
-func printUsage() {
-	fmt.Fprintln(os.Stderr, `complexity-treemap
+func printUsage(w io.Writer) {
+	fmt.Fprintln(w, `complexity-explorer
 
 Subcommands:
   analyze  - compute complexity dataset and write JSON
   serve    - analyze and serve embedded web UI + /api/complexity
 
 Examples:
-  go run ./tools/complexity-treemap analyze --root . --include cmd,pkg --output /tmp/complexity.json
-  go run ./tools/complexity-treemap serve --root . --include cmd,pkg --addr :8787`)
+  go run ./tools/complexity-treemap/cmd/complexity-explorer analyze --root . --include . --output ./complexity.json
+  go run ./tools/complexity-treemap/cmd/complexity-explorer serve --root . --include . --addr :8787`)
 }
 
 func runAnalyze(args []string) error {
 	fsFlags := flag.NewFlagSet("analyze", flag.ContinueOnError)
 	root := fsFlags.String("root", ".", "repository root to analyze")
-	include := fsFlags.String("include", "cmd,pkg", "comma-separated directories under root to include")
+	include := fsFlags.String("include", ".", "comma-separated directories under root to include")
 	output := fsFlags.String("output", "", "output JSON file path")
 	if err := fsFlags.Parse(args); err != nil {
 		return err
@@ -74,10 +76,10 @@ func runAnalyze(args []string) error {
 	return writeJSONFile(*output, data)
 }
 
-func runServe(args []string) error {
+func runServe(args []string, stdout io.Writer) error {
 	fsFlags := flag.NewFlagSet("serve", flag.ContinueOnError)
 	root := fsFlags.String("root", ".", "repository root to analyze")
-	include := fsFlags.String("include", "cmd,pkg", "comma-separated directories under root to include")
+	include := fsFlags.String("include", ".", "comma-separated directories under root to include")
 	addr := fsFlags.String("addr", ":8787", "HTTP listen address")
 	if err := fsFlags.Parse(args); err != nil {
 		return err
@@ -108,7 +110,7 @@ func runServe(args []string) error {
 		fileServer.ServeHTTP(w, r)
 	})
 
-	fmt.Printf("complexity-treemap listening on http://localhost%s\n", *addr)
+	fmt.Fprintf(stdout, "complexity-explorer listening on http://localhost%s\n", *addr)
 	return http.ListenAndServe(*addr, mux)
 }
 

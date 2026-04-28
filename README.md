@@ -1,4 +1,4 @@
-# Complexity Treemap
+# Complexity Explorer
 
 Pure-Go complexity explorer with an embedded web client.
 
@@ -58,10 +58,10 @@ No Python or Bash scripts are required.
 From repository root:
 
 ```bash
-go run ./tools/complexity-treemap analyze \
+go run ./tools/complexity-treemap/cmd/complexity-explorer analyze \
   --root . \
-  --include cmd,pkg \
-  --output /tmp/complexity.json
+  --include . \
+  --output ./complexity.json
 ```
 
 Flags:
@@ -75,9 +75,9 @@ Flags:
 From repository root:
 
 ```bash
-go run ./tools/complexity-treemap serve \
+go run ./tools/complexity-treemap/cmd/complexity-explorer serve \
   --root . \
-  --include cmd,pkg \
+  --include . \
   --addr :8787
 ```
 
